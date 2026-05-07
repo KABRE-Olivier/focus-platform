@@ -18,6 +18,12 @@ DB_PATH = "focus_platform.db"
 # ─────────────────────────────────────────
 
 def get_db():
+    if DATABASE_URL:
+        import psycopg2
+        import psycopg2.extras
+        conn = psycopg2.connect(DATABASE_URL)
+        conn.autocommit = False
+        return conn
     conn = sqlite3.connect(DB_PATH)
     conn.execute("PRAGMA foreign_keys = ON")
     conn.row_factory = sqlite3.Row
