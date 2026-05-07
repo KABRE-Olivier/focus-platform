@@ -1,4 +1,4 @@
-﻿import sqlite3
+import sqlite3
 import os
 import hashlib
 import uuid
@@ -15,8 +15,31 @@ else:
 def get_db():
     if DATABASE_URL:
         import psycopg2
+        import psycopg2.extras
         conn = psycopg2.connect(DATABASE_URL)
-        return conn
+        conn.autocommit = False
+
+        class PGWrapper:
+            def __init__(self, conn):
+                self._conn = conn
+            def execute(self, sql, params=None):
+                sql = sql.replace('?', '%s')
+                sql = sql.replace('datetime(', 'to_timestamp(extract(epoch from now()))--datetime(')
+                cur = self._conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+                cur.execute(sql, params or ())
+                return cur
+            def cursor(self):
+                return self._conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+            def commit(self):
+                self._conn.commit()
+            def close(self):
+                self._conn.close()
+            def __enter__(self):
+                return self
+            def __exit__(self, *args):
+                self._conn.close()
+
+        return PGWrapper(conn)
     conn = sqlite3.connect(DB_PATH)
     conn.execute('PRAGMA foreign_keys = ON')
     conn.row_factory = sqlite3.Row
