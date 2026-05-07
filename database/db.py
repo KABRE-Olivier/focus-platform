@@ -15,21 +15,51 @@ else:
 def get_db():
     if DATABASE_URL:
         import psycopg2
-        import psycopg2.extras
-        conn = psycopg2.connect(DATABASE_URL)
-        conn.autocommit = False
+
+        class PGRow:
+            def __init__(self, row, description):
+                self._row = row
+                self._keys = [d[0] for d in description] if description else []
+            def __getitem__(self, key):
+                if isinstance(key, int):
+                    return self._row[key]
+                return self._row[self._keys.index(key)]
+            def keys(self):
+                return self._keys
+
+        class PGCursor:
+            def __init__(self, cur):
+                self._cur = cur
+            def fetchone(self):
+                row = self._cur.fetchone()
+                if row is None:
+                    return None
+                return PGRow(row, self._cur.description)
+            def fetchall(self):
+                rows = self._cur.fetchall()
+                return [PGRow(r, self._cur.description) for r in rows]
+            def __iter__(self):
+                for row in self._cur:
+                    yield PGRow(row, self._cur.description)
+            def __getattr__(self, name):
+                return getattr(self._cur, name)
 
         class PGWrapper:
             def __init__(self, conn):
                 self._conn = conn
             def execute(self, sql, params=None):
                 sql = sql.replace('?', '%s')
-                sql = sql.replace('datetime(', 'to_timestamp(extract(epoch from now()))--datetime(')
-                cur = self._conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-                cur.execute(sql, params or ())
-                return cur
+                sql = sql.replace("datetime('now')", 'NOW()')
+                sql = sql.replace('datetime(', 'NOW()--datetime(')
+                sql = sql.replace("date('now')", 'CURRENT_DATE')
+                cur = self._conn.cursor()
+                if params:
+                    cur.execute(sql, params)
+                else:
+                    cur.execute(sql)
+                return PGCursor(cur)
             def cursor(self):
-                return self._conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+                return self._conn.cursor()
             def commit(self):
                 self._conn.commit()
             def close(self):
@@ -39,6 +69,7 @@ def get_db():
             def __exit__(self, *args):
                 self._conn.close()
 
+        conn = psycopg2.connect(DATABASE_URL)
         return PGWrapper(conn)
     conn = sqlite3.connect(DB_PATH)
     conn.execute('PRAGMA foreign_keys = ON')
