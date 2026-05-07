@@ -1,0 +1,4 @@
+﻿flask
+reportlab
+requests
+gunicorn

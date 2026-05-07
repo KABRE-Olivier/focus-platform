@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ module['title'] }} — FOCUS</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root { --teal:#1A7A6E; --teal-dark:#0F5A50; --teal-light:#E6F5F3; --gold:#C8A84B; --gold-light:#F5EDD6; --ink:#1A1A2E; --soft:#64748B; --border:#E2E8F0; --success:#38A169; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'DM Sans',sans-serif; background:#F0F4F8; min-height:100vh; }
+  .topbar { background:linear-gradient(135deg,#0D4D42,var(--teal)); padding:0 40px; height:64px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 2px 12px rgba(0,0,0,0.15); }
+  .topbar-left { display:flex; align-items:center; gap:16px; }
+  .topbar-logo { font-family:'Playfair Display',serif; font-size:20px; font-weight:900; color:white; letter-spacing:3px; text-decoration:none; }
+  .back-link { color:rgba(255,255,255,0.75); text-decoration:none; font-size:13px; }
+  .back-link:hover { color:white; }
+  .btn-logout { background:rgba(255,255,255,0.15); color:white; border:1px solid rgba(255,255,255,0.3); padding:7px 16px; border-radius:20px; font-size:13px; text-decoration:none; }
+  .main { max-width:800px; margin:0 auto; padding:40px; }
+  .module-hero { border-radius:20px; padding:40px; color:white; margin-bottom:32px; display:flex; align-items:center; gap:28px; background:linear-gradient(135deg,var(--teal-dark),var(--teal)); }
+  .module-icon-big { font-size:64px; flex-shrink:0; }
+  .module-hero-info { flex:1; }
+  .module-hero-info h1 { font-family:'Playfair Display',serif; font-size:28px; font-weight:900; margin-bottom:8px; }
+  .module-hero-info p { opacity:0.85; font-size:14px; line-height:1.6; margin-bottom:20px; }
+  .progress-row { display:flex; align-items:center; gap:12px; }
+  .progress-bar-hero { flex:1; height:8px; background:rgba(255,255,255,0.3); border-radius:8px; overflow:hidden; }
+  .progress-fill-hero { height:100%; background:white; border-radius:8px; }
+  .progress-pct { font-size:13px; font-weight:700; }
+  .section-title { font-size:11px; font-weight:700; color:var(--teal); letter-spacing:3px; text-transform:uppercase; margin-bottom:16px; padding-bottom:10px; border-bottom:1px solid var(--teal-light); }
+  .lessons-list { background:white; border-radius:16px; overflow:hidden; box-shadow:0 2px 12px rgba(0,0,0,0.06); margin-bottom:24px; }
+  .lesson-row { display:flex; align-items:center; gap:16px; padding:18px 24px; border-bottom:1px solid var(--border); text-decoration:none; transition:background 0.15s; }
+  .lesson-row:last-child { border-bottom:none; }
+  .lesson-row:hover { background:#F8FAFC; }
+  .lesson-num { width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:700; flex-shrink:0; }
+  .num-done { background:var(--success); color:white; }
+  .num-progress { background:var(--gold); color:white; }
+  .num-todo { background:var(--border); color:var(--soft); }
+  .lesson-info { flex:1; }
+  .lesson-name { font-size:15px; font-weight:600; color:var(--ink); margin-bottom:4px; }
+  .lesson-meta { font-size:12px; color:var(--soft); display:flex; gap:12px; }
+  .done-tag { color:var(--success); font-weight:600; }
+  .lesson-arrow { color:var(--soft); font-size:18px; }
+  .coach-cta { background:linear-gradient(135deg,var(--gold),#E8B830); border-radius:16px; padding:28px 32px; display:flex; align-items:center; justify-content:space-between; gap:20px; }
+  .coach-cta-text h3 { font-family:'Playfair Display',serif; font-size:20px; color:#7A5C10; margin-bottom:6px; }
+  .coach-cta-text p { font-size:13px; color:#9A7020; }
+  .btn { padding:12px 24px; border-radius:10px; font-size:14px; font-weight:600; text-decoration:none; display:inline-flex; align-items:center; gap:8px; transition:transform 0.15s; white-space:nowrap; }
+  .btn:hover { transform:translateY(-1px); }
+  .btn-dark { background:#7A5C10; color:white; }
+  .empty { padding:32px; text-align:center; color:var(--soft); font-size:14px; }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-left">
+    <a href="/dashboard" class="topbar-logo">FOCUS</a>
+    <a href="/modules" class="back-link">← Catalogue</a>
+  </div>
+  <a href="/logout" class="btn-logout">Déconnexion</a>
+</div>
+
+<div class="main">
+  <div class="module-hero">
+    <div class="module-icon-big">{{ module['icon'] }}</div>
+    <div class="module-hero-info">
+      <h1>{{ module['title'] }}</h1>
+      <p>{{ module['description'] }}</p>
+      <div class="progress-row">
+        <div class="progress-bar-hero">
+          <div class="progress-fill-hero" style="width:{{ pct }}%"></div>
+        </div>
+        <span class="progress-pct">{{ completed }}/{{ total }} leçons · {{ pct }}%</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">Leçons du module</div>
+  <div class="lessons-list">
+    {% for lesson in lessons %}
+    {% set status = lesson_progress.get(lesson['id'], 'not_started') %}
+    <a href="/modules/{{ module['slug'] }}/lesson/{{ lesson['id'] }}" class="lesson-row">
+      <div class="lesson-num {% if status == 'completed' %}num-done{% elif status == 'in_progress' %}num-progress{% else %}num-todo{% endif %}">
+        {% if status == 'completed' %}✓{% elif status == 'in_progress' %}→{% else %}{{ loop.index }}{% endif %}
+      </div>
+      <div class="lesson-info">
+        <div class="lesson-name">{{ lesson['title'] }}</div>
+        <div class="lesson-meta">
+          <span>{% if lesson['lesson_type'] == 'quiz' %}📝 Quiz{% elif lesson['lesson_type'] == 'video' %}▶ Vidéo{% else %}📖 Lecture{% endif %}</span>
+          <span>⏱ {{ lesson['duration_min'] }} min</span>
+          {% if status == 'completed' %}<span class="done-tag">✅ Terminé</span>
+          {% elif status == 'in_progress' %}<span style="color:var(--gold);font-weight:600">🔄 En cours</span>{% endif %}
+        </div>
+      </div>
+      <div class="lesson-arrow">→</div>
+    </a>
+    {% endfor %}
+    {% if lessons|length == 0 %}<div class="empty">Aucune leçon disponible pour l'instant.</div>{% endif %}
+  </div>
+
+  <div class="coach-cta">
+    <div class="coach-cta-text">
+      <h3>🤖 Coach IA — {{ module['title'].split()[0] }}</h3>
+      <p>Pose tes questions et entraîne-toi avec des scénarios réels.</p>
+    </div>
+    <a href="/modules/{{ module['slug'] }}/coach" class="btn btn-dark">Ouvrir le Coach →</a>
+  </div>
+</div>
+</body>
+</html>

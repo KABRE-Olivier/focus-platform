@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inscription — FOCUS Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --teal:       #1A7A6E;
+    --teal-dark:  #0F5A50;
+    --teal-light: #E6F5F3;
+    --gold:       #C8A84B;
+    --gold-light: #F5EDD6;
+    --ink:        #1A1A2E;
+    --soft:       #64748B;
+    --border:     #E2E8F0;
+    --error:      #E53E3E;
+    --success:    #38A169;
+    --warning:    #D69E2E;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    background: #F0F4F8;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 40px 20px;
+  }
+
+  .page-wrapper {
+    width: 100%;
+    max-width: 900px;
+  }
+
+  /* Header */
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+  }
+
+  .logo-area {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .logo-circle {
+    width: 44px; height: 44px;
+    background: var(--teal);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .logo-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 900;
+    color: var(--ink);
+    letter-spacing: 3px;
+  }
+
+  .login-link {
+    font-size: 14px;
+    color: var(--soft);
+  }
+
+  .login-link a {
+    color: var(--teal);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  /* Card */
+  .form-card {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 4px 40px rgba(0,0,0,0.08);
+  }
+
+  .card-header {
+    background: linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%);
+    padding: 36px 44px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .card-header-icon {
+    width: 56px; height: 56px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px;
+    flex-shrink: 0;
+  }
+
+  .card-header-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: white;
+  }
+
+  .card-header-sub {
+    font-size: 14px;
+    color: rgba(255,255,255,0.7);
+    margin-top: 4px;
+  }
+
+  /* Badge promise */
+  .badge-promise {
+    background: var(--gold-light);
+    border: 1px solid var(--gold);
+    border-radius: 12px;
+    padding: 14px 20px;
+    margin: 28px 44px 0;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 13px;
+    color: #7A5C10;
+  }
+
+  .badge-promise-icon { font-size: 24px; flex-shrink: 0; }
+  .badge-promise strong { display: block; font-weight: 700; margin-bottom: 2px; }
+
+  /* Form body */
+  .form-body { padding: 28px 44px 44px; }
+
+  /* Section labels */
+  .section-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--teal);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 18px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--teal-light);
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin-bottom: 24px;
+  }
+
+  .form-grid.single { grid-template-columns: 1fr; }
+
+  .field { display: flex; flex-direction: column; gap: 7px; }
+  .field.full { grid-column: span 2; }
+
+  label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: 0.3px;
+  }
+
+  .label-required::after {
+    content: ' *';
+    color: var(--error);
+  }
+
+  input, select {
+    padding: 13px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--ink);
+    background: #FAFAFA;
+    transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+    outline: none;
+    width: 100%;
+  }
+
+  input:focus, select:focus {
+    border-color: var(--teal);
+    background: white;
+    box-shadow: 0 0 0 3px rgba(26,122,110,0.1);
+  }
+
+  input::placeholder { color: #A0AEC0; }
+
+  /* Password strength */
+  .strength-bar {
+    height: 4px;
+    background: var(--border);
+    border-radius: 4px;
+    margin-top: 6px;
+    overflow: hidden;
+  }
+
+  .strength-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.3s, background 0.3s;
+    width: 0%;
+  }
+
+  .strength-label {
+    font-size: 11px;
+    color: var(--soft);
+    margin-top: 4px;
+  }
+
+  /* Flash */
+  .flash-msg {
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    margin-bottom: 20px;
+    font-weight: 500;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .flash-error   { background: #FFF5F5; color: var(--error);   border: 1px solid #FED7D7; }
+  .flash-success { background: #F0FFF4; color: var(--success); border: 1px solid #C6F6D5; }
+  .flash-warning { background: #FFFFF0; color: var(--warning); border: 1px solid #FAF089; }
+
+  /* Charter checkbox */
+  .charter-box {
+    background: var(--teal-light);
+    border: 1px solid #B2DFDB;
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .charter-box input[type="checkbox"] {
+    width: 18px; height: 18px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    accent-color: var(--teal);
+    cursor: pointer;
+  }
+
+  .charter-text {
+    font-size: 13px;
+    color: var(--teal-dark);
+    line-height: 1.6;
+  }
+
+  .charter-text strong { font-weight: 700; }
+
+  .btn-primary {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(15,90,80,0.35);
+  }
+
+  .pillar-chips {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+    justify-content: center;
+  }
+
+  .chip {
+    background: var(--teal-light);
+    color: var(--teal);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 5px 12px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+  }
+
+  @media (max-width: 640px) {
+    body { padding: 20px 12px; }
+    .card-header { padding: 24px; flex-direction: column; text-align: center; }
+    .form-body { padding: 20px 24px 32px; }
+    .form-grid { grid-template-columns: 1fr; }
+    .field.full { grid-column: span 1; }
+    .badge-promise { margin: 20px 24px 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page-wrapper">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="logo-area">
+      <div class="logo-circle">
+        <svg width="26" height="26" viewBox="0 0 80 80">
+          <circle cx="40" cy="40" r="38" fill="white" opacity="0.9"/>
+          <ellipse cx="32" cy="54" rx="8" ry="12" fill="#1A7A6E"/>
+          <circle cx="32" cy="37" r="6" fill="#1A7A6E"/>
+          <line x1="32" y1="43" x2="50" y2="25" stroke="#1A7A6E" stroke-width="3.5" stroke-linecap="round"/>
+          <polygon points="52,14 54.5,20 61,20 56,24.5 58,31 52,27 46,31 48,24.5 43,20 49.5,20" fill="#C8A84B"/>
+        </svg>
+      </div>
+      <div class="logo-name">FOCUS</div>
+    </div>
+    <div class="login-link">
+      Déjà membre ? <a href="/login">Se connecter</a>
+    </div>
+  </div>
+
+  <!-- Card -->
+  <div class="form-card">
+
+    <div class="card-header">
+      <div class="card-header-icon">🌱</div>
+      <div>
+        <div class="card-header-title">Rejoindre FOCUS</div>
+        <div class="card-header-sub">Crée ton compte et commence ta formation de leader transformationnel</div>
+      </div>
+    </div>
+
+    <!-- Badge promise -->
+    <div class="badge-promise">
+      <div class="badge-promise-icon">🏅</div>
+      <div>
+        <strong>Badge "L'Éveillé" offert à l'inscription !</strong>
+        Dès que ton compte est validé par la coordination, tu reçois automatiquement ton premier badge et 50 points.
+      </div>
+    </div>
+
+    <div class="form-body">
+
+      <!-- Flash messages -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="flash-msg flash-{{ category }}">
+              {% if category == 'error' %}⚠️{% elif category == 'success' %}✅{% else %}⏳{% endif %}
+              {{ message }}
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <form method="POST" action="/register">
+
+        <!-- Section 1 -->
+        <div class="section-title">Informations personnelles</div>
+        <div class="form-grid">
+          <div class="field full">
+            <label class="label-required">Nom complet</label>
+            <input type="text" name="full_name" placeholder="Ex: Abdoul Karim Ouédraogo" required minlength="3">
+          </div>
+          <div class="field">
+            <label class="label-required">Adresse email</label>
+            <input type="email" name="email" placeholder="ton@email.com" required>
+          </div>
+          <div class="field">
+            <label>Ville</label>
+            <input type="text" name="city" placeholder="Ouagadougou, Bobo...">
+          </div>
+        </div>
+
+        <!-- Section 2 -->
+        <div class="section-title">Établissement</div>
+        <div class="form-grid single">
+          <div class="field">
+            <label>Lycée / Université</label>
+            <input type="text" name="establishment" placeholder="Ex: Centrale-2iE, Lycée Nelson Mandela...">
+          </div>
+        </div>
+
+        <!-- Section 3 -->
+        <div class="section-title">Sécurité du compte</div>
+        <div class="form-grid">
+          <div class="field">
+            <label class="label-required">Mot de passe</label>
+            <input type="password" name="password" id="password"
+                   placeholder="Min. 8 caractères" required minlength="8"
+                   oninput="checkStrength(this.value)">
+            <div class="strength-bar">
+              <div class="strength-fill" id="strength-fill"></div>
+            </div>
+            <div class="strength-label" id="strength-label">Saisis un mot de passe</div>
+          </div>
+          <div class="field">
+            <label class="label-required">Confirmer le mot de passe</label>
+            <input type="password" name="confirm_password"
+                   placeholder="Répète ton mot de passe" required>
+          </div>
+        </div>
+
+        <!-- Charter -->
+        <div class="charter-box">
+          <input type="checkbox" name="charter" id="charter" required>
+          <label for="charter" class="charter-text" style="cursor:pointer">
+            En m'inscrivant, je m'engage à respecter la <strong>Charte du Leader FOCUS</strong> :
+            Patriotisme · Intégrité · Excellence · Service · Relève.
+            Je comprends que mon compte sera validé par la coordination avant activation.
+          </label>
+        </div>
+
+        <button type="submit" class="btn-primary">
+          🌱 &nbsp; Créer mon compte FOCUS
+        </button>
+
+      </form>
+
+      <div class="pillar-chips">
+        <span class="chip">🏴 Patriotisme</span>
+        <span class="chip">⚖️ Intégrité</span>
+        <span class="chip">🌟 Excellence</span>
+        <span class="chip">🤝 Service</span>
+        <span class="chip">🌱 Relève</span>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+function checkStrength(pwd) {
+  const fill  = document.getElementById('strength-fill');
+  const label = document.getElementById('strength-label');
+  let score = 0;
+  if (pwd.length >= 8)  score++;
+  if (pwd.length >= 12) score++;
+  if (/[A-Z]/.test(pwd)) score++;
+  if (/[0-9]/.test(pwd)) score++;
+  if (/[^A-Za-z0-9]/.test(pwd)) score++;
+
+  const levels = [
+    { w: '0%',   c: '#E53E3E', t: 'Trop court'    },
+    { w: '25%',  c: '#E53E3E', t: 'Faible'        },
+    { w: '50%',  c: '#D69E2E', t: 'Moyen'         },
+    { w: '75%',  c: '#38A169', t: 'Bon'           },
+    { w: '90%',  c: '#1A7A6E', t: 'Très bon'      },
+    { w: '100%', c: '#0F5A50', t: 'Excellent ✅'  },
+  ];
+  const l = levels[Math.min(score, 5)];
+  fill.style.width      = l.w;
+  fill.style.background = l.c;
+  label.textContent     = l.t;
+  label.style.color     = l.c;
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Modules — FOCUS Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root { --teal:#1A7A6E; --teal-dark:#0F5A50; --teal-light:#E6F5F3; --gold:#C8A84B; --gold-light:#F5EDD6; --ink:#1A1A2E; --soft:#64748B; --border:#E2E8F0; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'DM Sans',sans-serif; background:#F0F4F8; min-height:100vh; }
+  .topbar { background:linear-gradient(135deg,#0D4D42,var(--teal)); padding:0 40px; height:64px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 2px 12px rgba(0,0,0,0.15); }
+  .topbar-logo { font-family:'Playfair Display',serif; font-size:20px; font-weight:900; color:white; letter-spacing:3px; text-decoration:none; }
+  .nav-links { display:flex; gap:24px; align-items:center; }
+  .nav-link { color:rgba(255,255,255,0.75); text-decoration:none; font-size:14px; font-weight:500; }
+  .nav-link:hover, .nav-link.active { color:white; }
+  .topbar-right { display:flex; align-items:center; gap:16px; }
+  .topbar-name { color:rgba(255,255,255,0.8); font-size:14px; }
+  .btn-logout { background:rgba(255,255,255,0.15); color:white; border:1px solid rgba(255,255,255,0.3); padding:7px 16px; border-radius:20px; font-size:13px; text-decoration:none; }
+  .main { padding:40px; max-width:1100px; margin:0 auto; }
+  .page-title { font-family:'Playfair Display',serif; font-size:32px; color:var(--ink); margin-bottom:6px; }
+  .page-sub { font-size:14px; color:var(--soft); margin-bottom:36px; }
+  .modules-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:24px; }
+  .module-card {
+    background:white; border-radius:20px; overflow:hidden;
+    box-shadow:0 2px 16px rgba(0,0,0,0.07);
+    transition:transform 0.2s, box-shadow 0.2s;
+    text-decoration:none; display:block;
+  }
+  .module-card:hover { transform:translateY(-4px); box-shadow:0 8px 32px rgba(0,0,0,0.12); }
+  .module-banner { height:120px; display:flex; align-items:center; justify-content:center; font-size:56px; position:relative; }
+  .module-certified { position:absolute; top:12px; right:12px; background:var(--gold); color:#7A5C10; font-size:11px; font-weight:700; padding:4px 10px; border-radius:20px; }
+  .module-body { padding:24px; }
+  .module-title { font-family:'Playfair Display',serif; font-size:20px; color:var(--ink); margin-bottom:6px; }
+  .module-desc { font-size:13px; color:var(--soft); line-height:1.6; margin-bottom:16px; }
+  .progress-bar { height:8px; background:var(--border); border-radius:8px; overflow:hidden; margin-bottom:6px; }
+  .progress-fill { height:100%; border-radius:8px; transition:width 0.5s; }
+  .progress-meta { display:flex; justify-content:space-between; font-size:12px; color:var(--soft); }
+  .module-footer { padding:16px 24px; border-top:1px solid var(--border); display:flex; gap:10px; }
+  .btn-module { flex:1; padding:10px; border-radius:8px; font-size:13px; font-weight:600; text-align:center; text-decoration:none; transition:opacity 0.2s; }
+  .btn-module:hover { opacity:0.85; }
+  .btn-start { color:white; }
+  .btn-coach { background:var(--gold-light); color:#7A5C10; }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a href="/dashboard" class="topbar-logo">FOCUS</a>
+  <div class="nav-links">
+    <a href="/dashboard" class="nav-link">Dashboard</a>
+    <a href="/modules" class="nav-link active">Modules</a>
+    <a href="/certificates" class="nav-link">Certificats</a>
+  </div>
+  <div class="topbar-right">
+    <span class="topbar-name">{{ user['full_name'].split()[0] }}</span>
+    <a href="/logout" class="btn-logout">Déconnexion</a>
+  </div>
+</div>
+
+<div class="main">
+  <div class="page-title">Catalogue de Formation</div>
+  <div class="page-sub">Choisis un module et commence ta progression — chaque étape te rapproche de ton certificat.</div>
+
+  <div class="modules-grid">
+    {% for item in progress %}
+    {% set m = item.module %}
+    <div>
+      <a href="/modules/{{ m.slug }}" class="module-card">
+        <div class="module-banner" style="background:{{ m.color }}22">
+          {{ m.icon }}
+          {% if m.id in cert_mids %}
+          <div class="module-certified">🏅 Certifié</div>
+          {% endif %}
+        </div>
+        <div class="module-body">
+          <div class="module-title">{{ m.title }}</div>
+          <div class="module-desc">{{ m.description }}</div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width:{{ item.percent }}%; background:{{ m.color }}"></div>
+          </div>
+          <div class="progress-meta">
+            <span>{{ item.completed }}/{{ item.total }} leçons</span>
+            <span style="color:{{ m.color }}; font-weight:700">{{ item.percent }}%</span>
+          </div>
+        </div>
+      </a>
+      <div class="module-footer" style="background:white; border-radius:0 0 20px 20px; margin-top:-1px;">
+        <a href="/modules/{{ m.slug }}" class="btn-module btn-start" style="background:{{ m.color }}">
+          {% if item.percent == 0 %}▶ Commencer{% elif item.percent == 100 %}✅ Revoir{% else %}→ Continuer{% endif %}
+        </a>
+        <a href="/modules/{{ m.slug }}/coach" class="btn-module btn-coach">🤖 Coach IA</a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+</body>
+</html>

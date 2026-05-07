@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mon Profil FOCUS — {{ user['full_name'] }}</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root { --teal:#1A7A6E; --teal-dark:#0F5A50; --teal-light:#E6F5F3; --gold:#C8A84B; --gold-light:#F5EDD6; --ink:#1A1A2E; --soft:#64748B; --border:#E2E8F0; --success:#38A169; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'DM Sans',sans-serif; background:#F0F4F8; min-height:100vh; }
+
+  .topbar { background:linear-gradient(135deg,#0D4D42,var(--teal)); padding:0 40px; height:64px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 2px 12px rgba(0,0,0,.15); }
+  .topbar-left { display:flex; align-items:center; gap:16px; }
+  .topbar-logo { font-family:'Playfair Display',serif; font-size:20px; font-weight:900; color:white; letter-spacing:3px; text-decoration:none; }
+  .nav-links { display:flex; gap:24px; }
+  .nav-link { color:rgba(255,255,255,.75); text-decoration:none; font-size:14px; font-weight:500; }
+  .nav-link:hover,.nav-link.active { color:white; }
+  .btn-logout { background:rgba(255,255,255,.15); color:white; border:1px solid rgba(255,255,255,.3); padding:7px 16px; border-radius:20px; font-size:13px; text-decoration:none; }
+
+  .main { max-width:900px; margin:0 auto; padding:40px; }
+
+  /* HERO PROFIL */
+  .profile-hero {
+    background:linear-gradient(135deg,var(--teal-dark),var(--teal));
+    border-radius:20px; padding:40px; margin-bottom:28px;
+    display:flex; align-items:center; gap:32px; position:relative; overflow:hidden;
+  }
+  .profile-hero::before {
+    content:''; position:absolute; right:-60px; top:-60px;
+    width:200px; height:200px; border-radius:50%; background:rgba(255,255,255,.05);
+  }
+  .avatar-big {
+    width:90px; height:90px; border-radius:50%;
+    background:rgba(255,255,255,.2); border:3px solid var(--gold);
+    display:flex; align-items:center; justify-content:center;
+    font-size:36px; font-weight:900; color:white; flex-shrink:0;
+    font-family:'Playfair Display',serif;
+  }
+  .profile-info h1 { font-family:'Playfair Display',serif; font-size:26px; color:white; margin-bottom:6px; }
+  .profile-info p { color:rgba(255,255,255,.75); font-size:14px; margin-bottom:12px; }
+  .profile-chips { display:flex; gap:10px; flex-wrap:wrap; }
+  .chip { background:rgba(255,255,255,.15); color:white; padding:5px 14px; border-radius:20px; font-size:12px; font-weight:600; }
+  .chip-gold { background:var(--gold); color:#7A5C10; }
+  .points-big { margin-left:auto; text-align:center; background:rgba(255,255,255,.1); border-radius:16px; padding:20px 28px; border:1px solid rgba(255,255,255,.2); }
+  .points-num { font-family:'Playfair Display',serif; font-size:40px; font-weight:900; color:var(--gold); }
+  .points-label { font-size:11px; color:rgba(255,255,255,.6); letter-spacing:2px; text-transform:uppercase; }
+
+  /* ATTESTATION GLOBALE */
+  .attestation-card {
+    background:linear-gradient(135deg,#0D4D42,var(--teal));
+    border-radius:20px; padding:36px; margin-bottom:28px;
+    border:3px solid var(--gold); position:relative; overflow:hidden;
+  }
+  .attestation-card::after {
+    content:'★'; position:absolute; right:24px; top:50%; transform:translateY(-50%);
+    font-size:80px; color:rgba(200,168,75,.15);
+  }
+  .attestation-label { color:var(--gold); font-size:11px; letter-spacing:3px; text-transform:uppercase; font-weight:700; margin-bottom:10px; }
+  .attestation-title { font-family:'Playfair Display',serif; font-size:22px; color:white; margin-bottom:8px; }
+  .attestation-desc { color:rgba(255,255,255,.7); font-size:14px; margin-bottom:20px; line-height:1.6; }
+  .attestation-actions { display:flex; gap:12px; }
+  .btn { padding:12px 24px; border-radius:10px; font-size:14px; font-weight:600; text-decoration:none; display:inline-flex; align-items:center; gap:8px; transition:transform .15s; cursor:pointer; border:none; font-family:'DM Sans',sans-serif; }
+  .btn:hover { transform:translateY(-1px); }
+  .btn-gold { background:var(--gold); color:#7A5C10; }
+  .btn-outline-white { background:rgba(255,255,255,.15); color:white; border:1px solid rgba(255,255,255,.3); }
+
+  /* PROGRESSION GLOBALE */
+  .progress-card { background:white; border-radius:16px; padding:28px; box-shadow:0 2px 12px rgba(0,0,0,.06); margin-bottom:28px; }
+  .card-title { font-size:11px; font-weight:700; color:var(--teal); letter-spacing:3px; text-transform:uppercase; margin-bottom:20px; padding-bottom:10px; border-bottom:1px solid var(--teal-light); }
+
+  .module-progress-item { display:flex; align-items:center; gap:16px; padding:14px 0; border-bottom:1px solid var(--border); }
+  .module-progress-item:last-child { border-bottom:none; }
+  .mod-icon { width:44px; height:44px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
+  .mod-info { flex:1; }
+  .mod-name { font-size:14px; font-weight:600; color:var(--ink); margin-bottom:4px; }
+  .prog-bar { height:8px; background:var(--border); border-radius:8px; overflow:hidden; margin-bottom:4px; }
+  .prog-fill { height:100%; border-radius:8px; }
+  .prog-meta { font-size:12px; color:var(--soft); }
+  .mod-score { font-size:13px; font-weight:700; padding:4px 12px; border-radius:20px; }
+  .score-ok { background:var(--teal-light); color:var(--teal); }
+  .score-pending { background:#F0F4F8; color:var(--soft); }
+
+  /* BADGES */
+  .badges-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+  .badge-card { background:white; border-radius:14px; padding:20px; text-align:center; box-shadow:0 2px 12px rgba(0,0,0,.06); border-top:3px solid var(--teal); }
+  .badge-card.earned { border-top-color:var(--gold); background:var(--gold-light); }
+  .badge-emoji { font-size:32px; margin-bottom:8px; }
+  .badge-name { font-size:13px; font-weight:700; color:var(--ink); margin-bottom:4px; }
+  .badge-desc { font-size:11px; color:var(--soft); line-height:1.5; }
+  .badge-date { font-size:10px; color:var(--teal); font-weight:600; margin-top:6px; }
+
+  /* LOCKED */
+  .locked { opacity:.5; filter:grayscale(1); }
+
+  .not-yet-card { background:white; border-radius:16px; padding:36px; text-align:center; box-shadow:0 2px 12px rgba(0,0,0,.06); margin-bottom:28px; }
+  .not-yet-icon { font-size:56px; margin-bottom:16px; }
+  .not-yet-title { font-family:'Playfair Display',serif; font-size:20px; color:var(--ink); margin-bottom:8px; }
+  .not-yet-sub { font-size:14px; color:var(--soft); line-height:1.6; margin-bottom:20px; }
+  .progress-global-bar { height:12px; background:var(--border); border-radius:12px; overflow:hidden; margin:16px 0; }
+  .progress-global-fill { height:100%; background:linear-gradient(90deg,var(--teal),var(--gold)); border-radius:12px; transition:width .5s; }
+  .progress-global-text { font-size:13px; color:var(--soft); }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a href="/dashboard" class="topbar-logo">FOCUS</a>
+  <div class="nav-links">
+    <a href="/dashboard" class="nav-link">Dashboard</a>
+    <a href="/modules" class="nav-link">Modules</a>
+    <a href="/certificates" class="nav-link">Certificats</a>
+    <a href="/profile" class="nav-link active">Mon Profil</a>
+  </div>
+  <a href="/logout" class="btn-logout">Déconnexion</a>
+</div>
+
+<div class="main">
+
+  <!-- HERO PROFIL -->
+  <div class="profile-hero">
+    <div class="avatar-big">{{ user['full_name'][0].upper() }}</div>
+    <div class="profile-info">
+      <h1>{{ user['full_name'] }}</h1>
+      <p>{{ user['establishment'] or 'FOCUS Member' }}{% if user['city'] %} · {{ user['city'] }}{% endif %}</p>
+      <div class="profile-chips">
+        <span class="chip">🎓 Membre FOCUS</span>
+        {% if all_completed %}
+        <span class="chip chip-gold">🏆 FOCUS Certifié</span>
+        {% endif %}
+        <span class="chip">{{ completed_count }}/{{ total_count }} modules</span>
+      </div>
+    </div>
+    <div class="points-big">
+      <div class="points-num">{{ user['points'] }}</div>
+      <div class="points-label">Points FOCUS</div>
+    </div>
+  </div>
+
+  <!-- ATTESTATION GLOBALE -->
+  {% if all_completed %}
+  <div class="attestation-card">
+    <div class="attestation-label">✦ Attestation Globale FOCUS</div>
+    <div class="attestation-title">🏆 Félicitations {{ user['full_name'].split()[0] }} — Tu es FOCUS Certifié(e) !</div>
+    <div class="attestation-desc">
+      Tu as complété les 4 modules du programme FOCUS Leadership 2.0 avec succès.<br>
+      Ton attestation officielle est prête à être téléchargée et partagée.
+    </div>
+    <div class="attestation-actions">
+      <a href="/attestation/download" class="btn btn-gold">📄 Télécharger l'Attestation PDF</a>
+      <a href="/verify/attestation/{{ attestation_uid }}" class="btn btn-outline-white" target="_blank">🔍 Vérifier en ligne</a>
+    </div>
+  </div>
+  {% else %}
+  <div class="not-yet-card">
+    <div class="not-yet-icon">🎯</div>
+    <div class="not-yet-title">Ton Attestation FOCUS t'attend</div>
+    <div class="not-yet-sub">
+      Complete les {{ total_count }} modules du programme pour obtenir ton Attestation Officielle FOCUS.<br>
+      Il te reste <strong>{{ total_count - completed_count }} module(s)</strong> à valider.
+    </div>
+    <div class="progress-global-bar">
+      <div class="progress-global-fill" style="width:{{ (completed_count / total_count * 100)|int }}%"></div>
+    </div>
+    <div class="progress-global-text">{{ completed_count }} / {{ total_count }} modules complétés · {{ (completed_count / total_count * 100)|int }}%</div>
+    <br>
+    <a href="/modules" class="btn btn-gold" style="display:inline-flex;margin-top:8px">→ Continuer ma formation</a>
+  </div>
+  {% endif %}
+
+  <!-- PROGRESSION PAR MODULE -->
+  <div class="progress-card">
+    <div class="card-title">Progression par Module</div>
+    {% for item in progress %}
+    {% set m = item.module %}
+    <div class="module-progress-item">
+      <div class="mod-icon" style="background:{{ m.color }}22">{{ m.icon }}</div>
+      <div class="mod-info">
+        <div class="mod-name">{{ m.title }}</div>
+        <div class="prog-bar">
+          <div class="prog-fill" style="width:{{ item.percent }}%;background:{{ m.color }}"></div>
+        </div>
+        <div class="prog-meta">{{ item.completed }}/{{ item.total }} leçons · {{ item.percent }}%</div>
+      </div>
+      {% set cert = cert_map.get(m.id) %}
+      {% if cert %}
+      <span class="mod-score score-ok">✅ {{ cert.final_score }}%</span>
+      {% else %}
+      <span class="mod-score score-pending">En cours</span>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- BADGES -->
+  <div class="progress-card">
+    <div class="card-title">Mes Badges ({{ earned_badges|length }}/{{ all_badges|length }})</div>
+    <div class="badges-grid">
+      {% for badge in all_badges %}
+      {% set earned = badge.id in earned_badge_ids %}
+      <div class="badge-card {% if earned %}earned{% else %}locked{% endif %}">
+        <div class="badge-emoji">{{ badge['icon'] }}</div>
+        <div class="badge-name">{{ badge['name'] }}</div>
+        <div class="badge-desc">{{ badge['description'] }}</div>
+        {% if earned %}
+        {% for eb in earned_badges %}
+        {% if eb['id'] == badge['id'] %}
+        <div class="badge-date">Obtenu le {{ eb['awarded_at'][:10] }}</div>
+        {% endif %}
+        {% endfor %}
+        {% else %}
+        <div class="badge-date" style="color:var(--soft)">🔒 Non obtenu</div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

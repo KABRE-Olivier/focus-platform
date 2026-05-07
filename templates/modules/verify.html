@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vérification Certificat — FOCUS</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root { --teal:#1A7A6E; --teal-dark:#0F5A50; --teal-light:#E6F5F3; --gold:#C8A84B; --ink:#1A1A2E; --soft:#64748B; --border:#E2E8F0; --success:#38A169; --error:#E53E3E; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'DM Sans',sans-serif; background:#F0F4F8; min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:40px 20px; }
+  .logo { font-family:'Playfair Display',serif; font-size:24px; font-weight:900; color:var(--teal); letter-spacing:4px; margin-bottom:40px; }
+  .verify-card { background:white; border-radius:20px; padding:48px; max-width:560px; width:100%; box-shadow:0 4px 32px rgba(0,0,0,0.1); text-align:center; }
+  .verify-icon { font-size:64px; margin-bottom:20px; }
+  .verify-status { font-size:14px; font-weight:700; letter-spacing:2px; text-transform:uppercase; margin-bottom:16px; }
+  .status-valid { color:var(--success); }
+  .status-invalid { color:var(--error); }
+  .verify-title { font-family:'Playfair Display',serif; font-size:26px; color:var(--ink); margin-bottom:24px; }
+  .cert-info { background:var(--teal-light); border-radius:12px; padding:20px; margin-bottom:24px; text-align:left; }
+  .info-row { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(26,122,110,0.15); font-size:14px; }
+  .info-row:last-child { border-bottom:none; }
+  .info-label { color:var(--soft); }
+  .info-value { font-weight:600; color:var(--ink); }
+  .uid-box { background:#F8FAFC; border:1px solid var(--border); border-radius:8px; padding:10px 14px; font-family:monospace; font-size:12px; color:var(--soft); margin-bottom:24px; word-break:break-all; }
+  .btn { padding:12px 28px; border-radius:10px; font-size:14px; font-weight:600; text-decoration:none; display:inline-block; }
+  .btn-primary { background:var(--teal); color:white; }
+</style>
+</head>
+<body>
+  <div class="logo">FOCUS</div>
+  <div class="verify-card">
+    {% if cert %}
+      <div class="verify-icon">✅</div>
+      <div class="verify-status status-valid">✦ Certificat Authentique ✦</div>
+      <div class="verify-title">Ce certificat est valide</div>
+      <div class="cert-info">
+        <div class="info-row"><span class="info-label">Titulaire</span><span class="info-value">{{ cert['full_name'] }}</span></div>
+        <div class="info-row"><span class="info-label">Module</span><span class="info-value">{{ cert['module_title'] }}</span></div>
+        <div class="info-row"><span class="info-label">Score</span><span class="info-value">{{ cert['final_score'] }}%</span></div>
+        <div class="info-row"><span class="info-label">Date</span><span class="info-value">{{ cert['issued_at'][:10] }}</span></div>
+        <div class="info-row"><span class="info-label">Émis par</span><span class="info-value">FOCUS — Leadership BF</span></div>
+      </div>
+      <div class="uid-box">🔑 {{ uid }}</div>
+      <a href="/" class="btn btn-primary">Retour à FOCUS</a>
+    {% else %}
+      <div class="verify-icon">❌</div>
+      <div class="verify-status status-invalid">Certificat Invalide</div>
+      <div class="verify-title">Ce certificat n'existe pas</div>
+      <p style="color:var(--soft);font-size:14px;margin-bottom:24px">L'identifiant <strong>{{ uid }}</strong> ne correspond à aucun certificat FOCUS valide.</p>
+      <a href="/" class="btn btn-primary">Retour à FOCUS</a>
+    {% endif %}
+  </div>
+</body>
+</html>

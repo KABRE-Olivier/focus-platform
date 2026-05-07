@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Connexion — FOCUS Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --teal:       #1A7A6E;
+    --teal-dark:  #0F5A50;
+    --teal-light: #E6F5F3;
+    --gold:       #C8A84B;
+    --ink:        #1A1A2E;
+    --soft:       #64748B;
+    --border:     #E2E8F0;
+    --error:      #E53E3E;
+    --success:    #38A169;
+    --warning:    #D69E2E;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    background: #F0F4F8;
+  }
+
+  /* ── LEFT PANEL ── */
+  .left-panel {
+    width: 45%;
+    background: linear-gradient(160deg, #0D4D42 0%, #1A7A6E 60%, #2DA08F 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 50px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .left-panel::before {
+    content: '';
+    position: absolute;
+    top: -100px; right: -100px;
+    width: 400px; height: 400px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+  }
+
+  .left-panel::after {
+    content: '';
+    position: absolute;
+    bottom: -80px; left: -80px;
+    width: 300px; height: 300px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.03);
+  }
+
+  .logo-area {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .logo-circle {
+    width: 52px; height: 52px;
+    background: white;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .logo-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-weight: 900;
+    color: white;
+    letter-spacing: 4px;
+  }
+
+  .logo-sub {
+    font-size: 10px;
+    color: rgba(255,255,255,0.6);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  .hero-text {
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-label {
+    color: var(--gold);
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 42px;
+    font-weight: 900;
+    color: white;
+    line-height: 1.1;
+    margin-bottom: 20px;
+  }
+
+  .hero-desc {
+    font-size: 15px;
+    color: rgba(255,255,255,0.7);
+    line-height: 1.7;
+    max-width: 340px;
+  }
+
+  .stats-row {
+    display: flex;
+    gap: 32px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .stat-item { text-align: center; }
+
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--gold);
+  }
+
+  .stat-label {
+    font-size: 11px;
+    color: rgba(255,255,255,0.55);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  /* ── RIGHT PANEL ── */
+  .right-panel {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+  }
+
+  .form-card {
+    background: white;
+    border-radius: 20px;
+    padding: 48px 44px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 4px 40px rgba(0,0,0,0.08);
+  }
+
+  .form-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+
+  .form-subtitle {
+    font-size: 14px;
+    color: var(--soft);
+    margin-bottom: 36px;
+  }
+
+  /* Flash messages */
+  .flash-msg {
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    margin-bottom: 20px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .flash-error   { background: #FFF5F5; color: var(--error);   border: 1px solid #FED7D7; }
+  .flash-success { background: #F0FFF4; color: var(--success); border: 1px solid #C6F6D5; }
+  .flash-warning { background: #FFFFF0; color: var(--warning); border: 1px solid #FAF089; }
+  .flash-info    { background: var(--teal-light); color: var(--teal); border: 1px solid #B2DFDB; }
+
+  .field {
+    margin-bottom: 20px;
+  }
+
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 7px;
+    letter-spacing: 0.3px;
+  }
+
+  input {
+    width: 100%;
+    padding: 13px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--ink);
+    background: #FAFAFA;
+    transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+    outline: none;
+  }
+
+  input:focus {
+    border-color: var(--teal);
+    background: white;
+    box-shadow: 0 0 0 3px rgba(26,122,110,0.1);
+  }
+
+  input::placeholder { color: #A0AEC0; }
+
+  .btn-primary {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    margin-top: 8px;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(15,90,80,0.35);
+  }
+
+  .btn-primary:active { transform: translateY(0); }
+
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 24px 0;
+  }
+
+  .divider-line { flex: 1; height: 1px; background: var(--border); }
+  .divider-text { font-size: 12px; color: #A0AEC0; }
+
+  .link-row {
+    text-align: center;
+    font-size: 13px;
+    color: var(--soft);
+  }
+
+  .link-row a {
+    color: var(--teal);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .link-row a:hover { text-decoration: underline; }
+
+  .badge-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 28px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .badge-chip {
+    background: var(--teal-light);
+    color: var(--teal);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+  }
+
+  @media (max-width: 768px) {
+    body { flex-direction: column; }
+    .left-panel { width: 100%; padding: 30px; min-height: auto; }
+    .hero-title { font-size: 28px; }
+    .stats-row { display: none; }
+    .right-panel { padding: 24px; }
+    .form-card { padding: 32px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LEFT -->
+<div class="left-panel">
+  <div class="logo-area">
+    <div class="logo-circle">
+      <svg width="36" height="36" viewBox="0 0 80 80">
+        <circle cx="40" cy="40" r="38" fill="#1A7A6E"/>
+        <ellipse cx="32" cy="54" rx="8" ry="12" fill="white"/>
+        <circle cx="32" cy="37" r="6" fill="white"/>
+        <line x1="32" y1="43" x2="50" y2="25" stroke="white" stroke-width="3.5" stroke-linecap="round"/>
+        <polygon points="52,14 54.5,20 61,20 56,24.5 58,31 52,27 46,31 48,24.5 43,20 49.5,20" fill="white"/>
+      </svg>
+    </div>
+    <div>
+      <div class="logo-name">FOCUS</div>
+      <div class="logo-sub">Leadership Platform</div>
+    </div>
+  </div>
+
+  <div class="hero-text">
+    <div class="hero-label">✦ Ta formation commence ici</div>
+    <div class="hero-title">Le leader<br>que tu dois<br>devenir.</div>
+    <div class="hero-desc">
+      Formation, coaching IA, badges et certificats — tout ce dont tu as besoin pour devenir un leader transformationnel au Burkina Faso.
+    </div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-item">
+      <div class="stat-num">4</div>
+      <div class="stat-label">Modules</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">6</div>
+      <div class="stat-label">Badges</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">IA</div>
+      <div class="stat-label">Coach</div>
+    </div>
+  </div>
+</div>
+
+<!-- RIGHT -->
+<div class="right-panel">
+  <div class="form-card">
+    <div class="form-title">Connexion</div>
+    <div class="form-subtitle">Content de te revoir, Leader 👋</div>
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash-msg flash-{{ category }}">
+            {% if category == 'error' %}⚠️{% elif category == 'success' %}✅{% elif category == 'warning' %}⏳{% else %}ℹ️{% endif %}
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="/login">
+      <div class="field">
+        <label for="email">Adresse email</label>
+        <input type="email" id="email" name="email"
+               placeholder="ton@email.com" required autocomplete="email">
+      </div>
+
+      <div class="field">
+        <label for="password">Mot de passe</label>
+        <input type="password" id="password" name="password"
+               placeholder="••••••••" required autocomplete="current-password">
+      </div>
+
+      <button type="submit" class="btn-primary">
+        Se connecter →
+      </button>
+    </form>
+
+    <div class="divider">
+      <div class="divider-line"></div>
+      <span class="divider-text">pas encore membre ?</span>
+      <div class="divider-line"></div>
+    </div>
+
+    <div class="link-row">
+      <a href="/register">Créer mon compte FOCUS</a>
+    </div>
+
+    <div class="badge-row">
+      <span class="badge-chip">🌱 L'Éveillé</span>
+      <span class="badge-chip">🔥 Transformateur</span>
+      <span class="badge-chip">🤝 Pilier</span>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

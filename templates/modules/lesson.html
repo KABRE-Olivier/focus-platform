@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ lesson['title'] }} — FOCUS</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--teal:#1A7A6E;--teal-dark:#0F5A50;--teal-light:#E6F5F3;--gold:#C8A84B;--gold-light:#F5EDD6;--ink:#1A1A2E;--soft:#64748B;--border:#E2E8F0;--success:#38A169;--error:#E53E3E;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'DM Sans',sans-serif;background:#F0F4F8;min-height:100vh;}
+  .topbar{background:linear-gradient(135deg,#0D4D42,var(--teal));padding:0 40px;height:64px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 12px rgba(0,0,0,0.15);}
+  .topbar-logo{font-family:'Playfair Display',serif;font-size:20px;font-weight:900;color:white;letter-spacing:3px;text-decoration:none;}
+  .topbar-right{display:flex;align-items:center;gap:16px;}
+  .btn-back{color:rgba(255,255,255,0.75);text-decoration:none;font-size:14px;}
+  .btn-logout{background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3);padding:7px 16px;border-radius:20px;font-size:13px;text-decoration:none;}
+  .main{max-width:780px;margin:0 auto;padding:32px 20px;}
+  .top-progress{background:white;border-radius:12px;padding:14px 20px;margin-bottom:20px;box-shadow:0 2px 8px rgba(0,0,0,0.06);display:flex;align-items:center;gap:14px;}
+  .tp-bar{flex:1;height:6px;background:var(--border);border-radius:6px;overflow:hidden;}
+  .tp-fill{height:100%;border-radius:6px;background:var(--teal);}
+  .tp-label{font-size:12px;color:var(--soft);white-space:nowrap;}
+  .tp-count{font-size:12px;color:var(--teal);font-weight:700;white-space:nowrap;}
+  .lesson-card{background:white;border-radius:20px;overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,0.07);}
+  .lesson-header{padding:28px 32px 20px;border-bottom:1px solid var(--border);}
+  .type-badge{display:inline-flex;align-items:center;gap:6px;background:var(--teal-light);color:var(--teal);font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;}
+  .lesson-title{font-family:'Playfair Display',serif;font-size:24px;color:var(--ink);line-height:1.2;}
+  .lesson-meta{font-size:12px;color:var(--soft);margin-top:6px;}
+  .lesson-body{padding:28px 32px;font-size:15px;color:var(--ink);line-height:1.85;}
+  .lesson-body p{margin-bottom:14px;}
+  .lesson-body ul,ol{margin:10px 0 14px 22px;}
+  .lesson-body li{margin-bottom:7px;color:#4A5568;}
+  .complete-section{padding:20px 32px;border-top:1px solid var(--border);}
+  .btn-complete{width:100%;padding:13px;background:var(--teal);color:white;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:background 0.2s;}
+  .btn-complete:hover{background:var(--teal-dark);}
+  .already-done{text-align:center;color:var(--success);font-weight:600;font-size:14px;padding:8px;}
+  /* QUIZ */
+  .quiz-section{padding:28px 32px;}
+  .quiz-intro{background:var(--gold-light);border:1px solid var(--gold);border-radius:12px;padding:14px 18px;margin-bottom:22px;font-size:13px;color:#7A5C10;}
+  .quiz-intro strong{display:block;margin-bottom:3px;font-size:14px;}
+  .question-block{margin-bottom:24px;}
+  .question-text{font-size:15px;font-weight:600;color:var(--ink);margin-bottom:12px;line-height:1.5;}
+  .q-num{color:var(--teal);margin-right:4px;}
+  .opt-label{display:flex;align-items:center;gap:12px;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;margin-bottom:7px;transition:all 0.15s;font-size:14px;}
+  .opt-label:hover{border-color:var(--teal);background:var(--teal-light);}
+  .opt-label.selected{border-color:var(--teal);background:var(--teal-light);font-weight:600;}
+  .opt-label.correct{border-color:var(--success);background:#F0FFF4;color:var(--success);}
+  .opt-label.wrong{border-color:var(--error);background:#FFF5F5;color:var(--error);}
+  .opt-bubble{width:26px;height:26px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
+  .opt-label.selected .opt-bubble{background:var(--teal);color:white;}
+  .opt-label.correct .opt-bubble{background:var(--success);color:white;}
+  .opt-label.wrong .opt-bubble{background:var(--error);color:white;}
+  .exp-box{background:#F8FAFC;border-left:3px solid var(--teal);border-radius:0 8px 8px 0;padding:10px 14px;margin-top:6px;font-size:13px;color:var(--soft);display:none;}
+  .exp-box.show{display:block;}
+  .btn-submit{width:100%;padding:13px;background:var(--teal);color:white;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;margin-top:8px;transition:background 0.2s;}
+  .btn-submit:hover{background:var(--teal-dark);}
+  .btn-submit:disabled{background:#A0AEC0;cursor:not-allowed;}
+  .result-banner{border-radius:14px;padding:22px;margin-bottom:20px;text-align:center;}
+  .result-pass{background:#F0FFF4;border:2px solid var(--success);}
+  .result-fail{background:#FFF5F5;border:2px solid var(--error);}
+  .result-score{font-family:'Playfair Display',serif;font-size:48px;font-weight:900;margin-bottom:4px;}
+  .result-pass .result-score{color:var(--success);}
+  .result-fail .result-score{color:var(--error);}
+  .result-label{font-size:15px;font-weight:600;}
+  .result-pass .result-label{color:var(--success);}
+  .result-fail .result-label{color:var(--error);}
+  .nav-buttons{display:flex;gap:12px;margin-top:20px;}
+  .btn-nav{flex:1;padding:12px;border-radius:10px;font-size:14px;font-weight:600;text-decoration:none;text-align:center;}
+  .btn-prev{background:white;color:var(--ink);border:1.5px solid var(--border);}
+  .btn-next{background:var(--teal);color:white;}
+  /* Modal */
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:100;align-items:center;justify-content:center;}
+  .modal-overlay.show{display:flex;}
+  .modal{background:white;border-radius:20px;padding:40px;text-align:center;max-width:420px;width:90%;}
+  .modal-icon{font-size:52px;margin-bottom:14px;}
+  .modal-title{font-family:'Playfair Display',serif;font-size:24px;color:var(--ink);margin-bottom:8px;}
+  .modal-sub{font-size:13px;color:var(--soft);margin-bottom:22px;line-height:1.6;}
+  .btn-dl{display:block;padding:12px;background:var(--gold);color:#7A5C10;border-radius:10px;font-weight:700;text-decoration:none;margin-bottom:8px;}
+  .btn-cont{display:block;padding:12px;background:var(--teal-light);color:var(--teal);border-radius:10px;font-weight:600;text-decoration:none;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="/dashboard" class="topbar-logo">FOCUS</a>
+  <div class="topbar-right">
+    <a href="/modules/{{ module['slug'] }}" class="btn-back">← {{ module['title'] }}</a>
+    <a href="/logout" class="btn-logout">Déconnexion</a>
+  </div>
+</div>
+
+<div class="main">
+
+  <div class="top-progress">
+    <span class="tp-label">{{ module['icon'] }} {{ module['title'] }}</span>
+    <div class="tp-bar">
+      <div class="tp-fill" style="width:{{ ((lesson_index+1)/lessons|length*100)|int }}%"></div>
+    </div>
+    <span class="tp-count">{{ lesson_index+1 }}/{{ lessons|length }}</span>
+  </div>
+
+  <div class="lesson-card">
+    <div class="lesson-header">
+      <div class="type-badge">
+        {% if lesson['lesson_type']=='quiz' %}📝 Quiz
+        {% elif lesson['lesson_type']=='video' %}🎬 Vidéo
+        {% else %}📖 Lecture{% endif %}
+      </div>
+      <div class="lesson-title">{{ lesson['title'] }}</div>
+      <div class="lesson-meta">⏱ {{ lesson['duration_min'] }} min</div>
+    </div>
+
+    {% if lesson['lesson_type'] == 'text' %}
+    <div class="lesson-body">
+      {% for line in lesson['content'].split('\n') %}
+        {% if line.startswith('**') and line.endswith('**') %}
+          <p><strong>{{ line[2:-2] }}</strong></p>
+        {% elif line.strip() == '' %}
+          <br>
+        {% elif line.startswith('- ') or line.startswith('* ') %}
+          <p>• {{ line[2:] }}</p>
+        {% elif line[0].isdigit() and '. ' in line %}
+          <p>{{ line }}</p>
+        {% else %}
+          <p>{{ line }}</p>
+        {% endif %}
+      {% endfor %}
+    </div>
+    <div class="complete-section">
+      {% if progress and progress['status'] == 'completed' %}
+        <div class="already-done">✅ Leçon déjà complétée — Continue !</div>
+      {% else %}
+        <button class="btn-complete" id="btn-complete" onclick="completeLesson()">
+          ✅ Marquer comme terminée (+20 pts)
+        </button>
+      {% endif %}
+    </div>
+
+    {% elif lesson['lesson_type'] == 'quiz' %}
+    <div class="quiz-section">
+      <div class="quiz-intro">
+        <strong>📝 {{ lesson['title'] }}</strong>
+        Score minimum : {{ module['passing_score'] }}% pour valider. Tu peux recommencer autant de fois que nécessaire.
+      </div>
+      <div id="quiz-form">
+        {% for q in questions %}
+        <div class="question-block">
+          <div class="question-text"><span class="q-num">Q{{ loop.index }}.</span> {{ q['question_text'] }}</div>
+          {% for opt,letter in [('option_a','a'),('option_b','b'),('option_c','c'),('option_d','d')] %}
+          <label class="opt-label" id="opt-{{ q['id'] }}-{{ letter }}" onclick="selectOpt({{ q['id'] }},'{{ letter }}',this)">
+            <input type="radio" style="display:none">
+            <div class="opt-bubble">{{ letter.upper() }}</div>
+            {{ q[opt] }}
+          </label>
+          {% endfor %}
+          <div class="exp-box" id="exp-{{ q['id'] }}">💡 {{ q['explanation'] }}</div>
+        </div>
+        {% endfor %}
+        <button class="btn-submit" id="btn-submit" onclick="submitQuiz()" disabled>Valider mes réponses</button>
+      </div>
+      <div id="quiz-result"></div>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="nav-buttons">
+    {% if prev_lesson %}
+    <a href="/modules/{{ module['slug'] }}/lesson/{{ prev_lesson['id'] }}" class="btn-nav btn-prev">← Précédent</a>
+    {% else %}
+    <a href="/modules/{{ module['slug'] }}" class="btn-nav btn-prev">← Retour</a>
+    {% endif %}
+    {% if next_lesson %}
+    <a href="/modules/{{ module['slug'] }}/lesson/{{ next_lesson['id'] }}" class="btn-nav btn-next">Suivant →</a>
+    {% else %}
+    <a href="/modules/{{ module['slug'] }}" class="btn-nav btn-next">Terminer ✅</a>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Certificat Modal -->
+<div class="modal-overlay" id="cert-modal">
+  <div class="modal">
+    <div class="modal-icon">🏅</div>
+    <div class="modal-title">Module Complété !</div>
+    <div class="modal-sub">Félicitations ! Tu as terminé <strong>{{ module['title'] }}</strong>. Ton certificat FOCUS est prêt !</div>
+    <a href="#" class="btn-dl" id="cert-dl">⬇️ Télécharger mon Certificat PDF</a>
+    <a href="/modules" class="btn-cont">→ Continuer ma formation</a>
+  </div>
+</div>
+
+<script>
+const slug='{{ module["slug"] }}', lessonId={{ lesson['id'] }};
+let answers={}, submitted=false;
+const totalQ={{ questions|length if questions else 0 }};
+
+function selectOpt(qid,letter,el){
+  if(submitted)return;
+  document.querySelectorAll(`[id^="opt-${qid}-"]`).forEach(l=>l.classList.remove('selected'));
+  el.classList.add('selected');
+  answers[qid]=letter;
+  document.getElementById('btn-submit').disabled=Object.keys(answers).length<totalQ;
+}
+
+async function completeLesson(){
+  const btn=document.getElementById('btn-complete');
+  btn.disabled=true; btn.textContent='Enregistrement...';
+  await fetch(`/modules/${slug}/lesson/${lessonId}/complete`,{method:'POST',headers:{'Content-Type':'application/json'}});
+  btn.textContent='✅ Terminée ! (+20 pts)'; btn.style.background='#38A169';
+}
+
+async function submitQuiz(){
+  if(submitted)return;
+  submitted=true;
+  const btn=document.getElementById('btn-submit');
+  btn.disabled=true; btn.textContent='Correction...';
+  const r=await fetch(`/modules/${slug}/lesson/${lessonId}/quiz`,{
+    method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({answers})
+  });
+  const d=await r.json();
+  d.results.forEach(res=>{
+    const uEl=document.getElementById(`opt-${res.question_id}-${res.user_answer}`);
+    const cEl=document.getElementById(`opt-${res.question_id}-${res.right_answer}`);
+    const eEl=document.getElementById(`exp-${res.question_id}`);
+    if(uEl)uEl.classList.add(res.correct?'correct':'wrong');
+    if(!res.correct&&cEl)cEl.classList.add('correct');
+    if(eEl)eEl.classList.add('show');
+  });
+  const rd=document.getElementById('quiz-result');
+  rd.innerHTML=d.passed
+    ?`<div class="result-banner result-pass"><div class="result-score">${d.score}%</div><div class="result-label">✅ Réussi ! ${d.correct}/${d.total} bonnes réponses</div></div>`
+    :`<div class="result-banner result-fail"><div class="result-score">${d.score}%</div><div class="result-label">❌ Score insuffisant (min. ${d.needed}%)</div></div><button class="btn-submit" onclick="location.reload()">🔄 Réessayer</button>`;
+  btn.style.display='none';
+  if(d.passed&&d.module_done&&d.cert_uid){
+    document.getElementById('cert-dl').href=`/certificates/${d.cert_uid}/download`;
+    document.getElementById('cert-modal').classList.add('show');
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FOCUS — Leadership Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --teal: #1A7A6E; --teal-dark: #0F5A50;
+    --gold: #C8A84B; --ink: #1A1A2E;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    background: linear-gradient(160deg, #0D4D42 0%, #1A7A6E 55%, #2DA08F 100%);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center; padding: 40px 20px;
+  }
+  .logo-circle {
+    width: 80px; height: 80px;
+    background: white; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 20px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  }
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 60px; font-weight: 900;
+    color: white; letter-spacing: 6px;
+    margin-bottom: 8px;
+  }
+  .sub {
+    color: rgba(255,255,255,0.65);
+    font-size: 14px; letter-spacing: 3px;
+    text-transform: uppercase; margin-bottom: 16px;
+  }
+  .tagline {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px; font-style: italic;
+    color: rgba(255,255,255,0.8);
+    margin-bottom: 48px; max-width: 500px;
+  }
+  .btn-row { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+  .btn {
+    padding: 14px 36px;
+    border-radius: 50px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px; font-weight: 600;
+    text-decoration: none;
+    transition: transform 0.15s, box-shadow 0.15s;
+    letter-spacing: 0.5px;
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.25); }
+  .btn-white { background: white; color: var(--teal-dark); }
+  .btn-outline { background: transparent; color: white; border: 2px solid rgba(255,255,255,0.5); }
+  .pillars {
+    display: flex; gap: 24px; margin-top: 56px;
+    flex-wrap: wrap; justify-content: center;
+  }
+  .pillar {
+    color: rgba(255,255,255,0.6);
+    font-size: 12px; letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  .pillar span { display: block; font-size: 20px; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+  <div class="logo-circle">
+    <svg width="52" height="52" viewBox="0 0 80 80">
+      <circle cx="40" cy="40" r="38" fill="#1A7A6E"/>
+      <ellipse cx="32" cy="54" rx="8" ry="12" fill="white"/>
+      <circle cx="32" cy="37" r="6" fill="white"/>
+      <line x1="32" y1="43" x2="50" y2="25" stroke="white" stroke-width="3.5" stroke-linecap="round"/>
+      <polygon points="52,14 54.5,20 61,20 56,24.5 58,31 52,27 46,31 48,24.5 43,20 49.5,20" fill="#C8A84B"/>
+    </svg>
+  </div>
+  <h1>FOCUS</h1>
+  <div class="sub">Leadership & Développement Personnel</div>
+  <div class="tagline">"Le leader que tu dois devenir commence ici."</div>
+  <div class="btn-row">
+    <a href="/register" class="btn btn-white">🌱 &nbsp; Rejoindre FOCUS</a>
+    <a href="/login"    class="btn btn-outline">Se connecter →</a>
+  </div>
+  <div class="pillars">
+    <div class="pillar"><span>🏴</span>Patriotisme</div>
+    <div class="pillar"><span>⚖️</span>Intégrité</div>
+    <div class="pillar"><span>🌟</span>Excellence</div>
+    <div class="pillar"><span>🤝</span>Service</div>
+    <div class="pillar"><span>🌱</span>Relève</div>
+  </div>
+</body>
+</html>

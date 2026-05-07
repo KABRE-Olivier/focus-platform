@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coach IA — {{ module['title'] }}</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root { --teal:#1A7A6E; --teal-dark:#0F5A50; --teal-light:#E6F5F3; --gold:#C8A84B; --gold-light:#F5EDD6; --ink:#1A1A2E; --soft:#64748B; --border:#E2E8F0; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'DM Sans',sans-serif; background:#F0F4F8; height:100vh; display:flex; flex-direction:column; }
+
+  .topbar { background:linear-gradient(135deg,#0D4D42,var(--teal)); padding:0 32px; height:60px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+  .topbar-left { display:flex; align-items:center; gap:16px; }
+  .topbar-logo { font-family:'Playfair Display',serif; font-size:18px; font-weight:900; color:white; letter-spacing:3px; text-decoration:none; }
+  .back-link { color:rgba(255,255,255,0.75); text-decoration:none; font-size:13px; }
+  .back-link:hover { color:white; }
+  .ai-badge { background:rgba(255,255,255,0.15); color:white; padding:4px 14px; border-radius:20px; font-size:12px; font-weight:600; }
+  .quota-display { color:rgba(255,255,255,0.75); font-size:12px; }
+
+  .chat-layout { display:flex; flex:1; overflow:hidden; }
+
+  /* SIDEBAR */
+  .chat-sidebar { width:280px; background:white; border-right:1px solid var(--border); display:flex; flex-direction:column; padding:24px; flex-shrink:0; }
+  .coach-card { background:linear-gradient(135deg,var(--teal),var(--teal-dark)); border-radius:16px; padding:20px; color:white; margin-bottom:20px; text-align:center; }
+  .coach-avatar { font-size:40px; margin-bottom:10px; }
+  .coach-name { font-family:'Playfair Display',serif; font-size:18px; font-weight:700; margin-bottom:4px; }
+  .coach-desc { font-size:12px; opacity:0.75; line-height:1.5; }
+  .tips-title { font-size:11px; font-weight:700; color:var(--soft); letter-spacing:2px; text-transform:uppercase; margin-bottom:12px; }
+  .tip-item { background:var(--teal-light); border-radius:8px; padding:10px 12px; font-size:12px; color:var(--teal-dark); margin-bottom:8px; line-height:1.5; cursor:pointer; transition:background 0.2s; }
+  .tip-item:hover { background:#C8E8E4; }
+
+  /* CHAT */
+  .chat-main { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+  .chat-messages { flex:1; overflow-y:auto; padding:24px; display:flex; flex-direction:column; gap:16px; }
+
+  /* Welcome */
+  .welcome-msg { background:white; border-radius:16px; padding:24px; box-shadow:0 2px 12px rgba(0,0,0,0.06); text-align:center; }
+  .welcome-msg h3 { font-family:'Playfair Display',serif; font-size:20px; color:var(--ink); margin-bottom:8px; }
+  .welcome-msg p { font-size:14px; color:var(--soft); line-height:1.6; }
+
+  /* Messages */
+  .msg { display:flex; gap:12px; max-width:75%; }
+  .msg.user { align-self:flex-end; flex-direction:row-reverse; }
+  .msg.ai { align-self:flex-start; }
+  .msg-avatar { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
+  .msg.ai .msg-avatar { background:linear-gradient(135deg,var(--teal),var(--teal-dark)); }
+  .msg.user .msg-avatar { background:var(--gold); }
+  .msg-bubble { padding:14px 18px; border-radius:16px; font-size:14px; line-height:1.7; }
+  .msg.ai .msg-bubble { background:white; color:var(--ink); border-radius:4px 16px 16px 16px; box-shadow:0 2px 8px rgba(0,0,0,0.06); white-space:pre-wrap; }
+  .msg.user .msg-bubble { background:var(--teal); color:white; border-radius:16px 4px 16px 16px; }
+
+  /* Typing indicator */
+  .typing { display:none; align-self:flex-start; }
+  .typing-dots { display:flex; gap:4px; padding:14px 18px; background:white; border-radius:4px 16px 16px 16px; box-shadow:0 2px 8px rgba(0,0,0,0.06); }
+  .dot { width:8px; height:8px; border-radius:50%; background:var(--teal); animation:bounce 1.2s infinite; }
+  .dot:nth-child(2) { animation-delay:0.2s; }
+  .dot:nth-child(3) { animation-delay:0.4s; }
+  @keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-8px)} }
+
+  /* Input */
+  .chat-input-area { background:white; border-top:1px solid var(--border); padding:16px 24px; flex-shrink:0; }
+  .quota-bar { display:flex; justify-content:space-between; font-size:12px; color:var(--soft); margin-bottom:10px; }
+  .quota-progress { height:4px; background:var(--border); border-radius:4px; overflow:hidden; margin-bottom:10px; }
+  .quota-fill { height:100%; background:var(--teal); border-radius:4px; transition:width 0.3s; }
+  .input-row { display:flex; gap:12px; }
+  .chat-input {
+    flex:1; padding:14px 18px; border:2px solid var(--border); border-radius:12px;
+    font-family:'DM Sans',sans-serif; font-size:14px; color:var(--ink);
+    background:#FAFAFA; outline:none; resize:none;
+    transition:border-color 0.2s, box-shadow 0.2s;
+  }
+  .chat-input:focus { border-color:var(--teal); background:white; box-shadow:0 0 0 3px rgba(26,122,110,0.1); }
+  .send-btn {
+    width:48px; height:48px; border-radius:12px;
+    background:var(--teal); color:white; border:none;
+    font-size:20px; cursor:pointer; flex-shrink:0;
+    transition:background 0.2s, transform 0.15s;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .send-btn:hover { background:var(--teal-dark); transform:scale(1.05); }
+  .send-btn:disabled { background:var(--border); cursor:not-allowed; transform:none; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <a href="/dashboard" class="topbar-logo">FOCUS</a>
+    <a href="/modules/{{ module['slug'] }}" class="back-link">← {{ module['title'] }}</a>
+  </div>
+  <div style="display:flex;align-items:center;gap:16px">
+    <span class="quota-display" id="quota-top">{{ max_count - count }} messages restants aujourd'hui</span>
+    <span class="ai-badge">🤖 Coach IA</span>
+  </div>
+</div>
+
+<div class="chat-layout">
+
+  <!-- SIDEBAR -->
+  <div class="chat-sidebar">
+    <div class="coach-card">
+      <div class="coach-avatar">{{ module['icon'] }}</div>
+      <div class="coach-name">Coach {{ module['title'].split()[0] }}</div>
+      <div class="coach-desc">Ton assistant personnel pour maîtriser ce module</div>
+    </div>
+
+    <div class="tips-title">Suggestions de questions</div>
+    {% if module['slug'] == 'leadership' %}
+      <div class="tip-item" onclick="usePrompt(this)">Simule un conflit dans mon équipe</div>
+      <div class="tip-item" onclick="usePrompt(this)">Explique-moi la Considération Individuelle</div>
+      <div class="tip-item" onclick="usePrompt(this)">Comment motiver un membre démotivé ?</div>
+      <div class="tip-item" onclick="usePrompt(this)">Teste mes connaissances sur Bass</div>
+    {% elif module['slug'] == 'project' %}
+      <div class="tip-item" onclick="usePrompt(this)">Joue le rôle d'un client difficile</div>
+      <div class="tip-item" onclick="usePrompt(this)">Mon budget vient d'être réduit de 30%</div>
+      <div class="tip-item" onclick="usePrompt(this)">Comment faire un planning de projet ?</div>
+      <div class="tip-item" onclick="usePrompt(this)">Quelles sont les phases d'un projet ?</div>
+    {% elif module['slug'] == 'python' %}
+      <div class="tip-item" onclick="usePrompt(this)">Corrige ce code : print("hello"</div>
+      <div class="tip-item" onclick="usePrompt(this)">Explique-moi les boucles for</div>
+      <div class="tip-item" onclick="usePrompt(this)">Donne-moi un exercice débutant</div>
+      <div class="tip-item" onclick="usePrompt(this)">C'est quoi une variable ?</div>
+    {% elif module['slug'] == 'english' %}
+      <div class="tip-item" onclick="usePrompt(this)">Let's talk about leadership</div>
+      <div class="tip-item" onclick="usePrompt(this)">Can you correct my English?</div>
+      <div class="tip-item" onclick="usePrompt(this)">Tell me about Burkina Faso in English</div>
+      <div class="tip-item" onclick="usePrompt(this)">Practice a job interview with me</div>
+    {% endif %}
+  </div>
+
+  <!-- CHAT -->
+  <div class="chat-main">
+    <div class="chat-messages" id="messages">
+
+      <div class="welcome-msg">
+        <h3>{{ module['icon'] }} Coach {{ module['title'].split()[0] }}</h3>
+        <p>Bonjour {{ user['full_name'].split()[0] }} ! Je suis ton Coach IA spécialisé en <strong>{{ module['title'] }}</strong>.<br>
+        Pose-moi une question, partage du code, ou demande-moi de simuler un scénario. Je suis là pour t'aider !</p>
+      </div>
+
+      <div class="typing" id="typing">
+        <div style="display:flex;gap:12px;align-items:flex-end">
+          <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--teal-dark));display:flex;align-items:center;justify-content:center;font-size:16px">🤖</div>
+          <div class="typing-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Input -->
+    <div class="chat-input-area">
+      <div class="quota-bar">
+        <span>Messages utilisés aujourd'hui</span>
+        <span id="quota-text">{{ count }} / {{ max_count }}</span>
+      </div>
+      <div class="quota-progress">
+        <div class="quota-fill" id="quota-fill" style="width:{{ (count / max_count * 100)|int }}%"></div>
+      </div>
+      <div class="input-row">
+        <textarea class="chat-input" id="chat-input" rows="1"
+          placeholder="Pose ta question au Coach IA..."
+          onkeydown="handleKey(event)"
+          oninput="autoResize(this)"></textarea>
+        <button class="send-btn" id="send-btn" onclick="sendMessage()">➤</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const slug    = "{{ module['slug'] }}";
+let msgCount  = {{ count }};
+const maxMsgs = {{ max_count }};
+let isLoading = false;
+
+function usePrompt(el) {
+  document.getElementById('chat-input').value = el.textContent.trim();
+  document.getElementById('chat-input').focus();
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+}
+
+function addMessage(role, text) {
+  const msgs   = document.getElementById('messages');
+  const typing = document.getElementById('typing');
+  const div    = document.createElement('div');
+  div.className = `msg ${role}`;
+  div.innerHTML = `
+    <div class="msg-avatar">${role === 'ai' ? '🤖' : '👤'}</div>
+    <div class="msg-bubble">${text.replace(/\n/g,'<br>')}</div>`;
+  msgs.insertBefore(div, typing);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function sendMessage() {
+  if (isLoading) return;
+  const input = document.getElementById('chat-input');
+  const msg   = input.value.trim();
+  if (!msg) return;
+  if (msgCount >= maxMsgs) {
+    alert(`Tu as atteint la limite de ${maxMsgs} messages par jour. Reviens demain ! 💪`);
+    return;
+  }
+
+  input.value = ''; input.style.height = 'auto';
+  addMessage('user', msg);
+  isLoading = true;
+
+  document.getElementById('typing').style.display = 'flex';
+  document.getElementById('send-btn').disabled = true;
+  document.getElementById('messages').scrollTop = 99999;
+
+  fetch(`/modules/${slug}/coach/chat`, {
+    method:  'POST',
+    headers: {'Content-Type':'application/json'},
+    body:    JSON.stringify({ message: msg })
+  })
+  .then(r => r.json())
+  .then(data => {
+    document.getElementById('typing').style.display = 'none';
+    if (data.error) {
+      addMessage('ai', '⚠️ ' + data.error);
+    } else {
+      addMessage('ai', data.reply);
+      msgCount = data.count;
+      const pct = Math.min((msgCount / maxMsgs) * 100, 100);
+      document.getElementById('quota-text').textContent = `${msgCount} / ${maxMsgs}`;
+      document.getElementById('quota-fill').style.width = pct + '%';
+      document.getElementById('quota-top').textContent  = `${data.remaining} messages restants aujourd'hui`;
+    }
+  })
+  .catch(() => {
+    document.getElementById('typing').style.display = 'none';
+    addMessage('ai', '⚠️ Connexion perdue. Vérifie ta connexion internet.');
+  })
+  .finally(() => {
+    isLoading = false;
+    document.getElementById('send-btn').disabled = false;
+    input.focus();
+  });
+}
+</script>
+</body>
+</html>

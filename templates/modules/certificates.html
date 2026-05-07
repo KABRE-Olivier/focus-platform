@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mes Certificats — FOCUS</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root { --teal:#1A7A6E; --teal-dark:#0F5A50; --teal-light:#E6F5F3; --gold:#C8A84B; --gold-light:#F5EDD6; --ink:#1A1A2E; --soft:#64748B; --border:#E2E8F0; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'DM Sans',sans-serif; background:#F0F4F8; min-height:100vh; }
+  .topbar { background:linear-gradient(135deg,#0D4D42,var(--teal)); padding:0 40px; height:64px; display:flex; align-items:center; justify-content:space-between; }
+  .topbar-logo { font-family:'Playfair Display',serif; font-size:20px; font-weight:900; color:white; letter-spacing:3px; text-decoration:none; }
+  .nav-links { display:flex; gap:24px; }
+  .nav-link { color:rgba(255,255,255,0.75); text-decoration:none; font-size:14px; }
+  .nav-link:hover,.nav-link.active { color:white; font-weight:600; }
+  .btn-logout { background:rgba(255,255,255,0.15); color:white; border:1px solid rgba(255,255,255,0.3); padding:7px 16px; border-radius:20px; font-size:13px; text-decoration:none; }
+  .main { padding:40px; max-width:900px; margin:0 auto; }
+  .page-title { font-family:'Playfair Display',serif; font-size:32px; color:var(--ink); margin-bottom:6px; }
+  .page-sub { font-size:14px; color:var(--soft); margin-bottom:36px; }
+
+  .cert-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(380px,1fr)); gap:24px; }
+  .cert-card { background:white; border-radius:20px; overflow:hidden; box-shadow:0 2px 16px rgba(0,0,0,0.07); }
+  .cert-banner { height:100px; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,var(--teal-dark),var(--teal)); position:relative; }
+  .cert-banner-icon { font-size:40px; }
+  .cert-ribbon { position:absolute; top:12px; right:12px; background:var(--gold); color:#7A5C10; font-size:10px; font-weight:700; padding:3px 10px; border-radius:20px; }
+  .cert-body { padding:24px; }
+  .cert-module { font-family:'Playfair Display',serif; font-size:18px; color:var(--ink); margin-bottom:6px; }
+  .cert-name { font-size:13px; color:var(--soft); margin-bottom:14px; }
+  .cert-meta { display:flex; gap:16px; font-size:12px; margin-bottom:20px; }
+  .cert-score { background:var(--teal-light); color:var(--teal); padding:4px 12px; border-radius:20px; font-weight:700; }
+  .cert-date { color:var(--soft); }
+  .cert-uid { font-size:11px; color:var(--soft); font-family:monospace; background:#F8FAFC; padding:6px 10px; border-radius:6px; margin-bottom:16px; word-break:break-all; }
+  .cert-actions { display:flex; gap:10px; }
+  .btn { padding:10px 18px; border-radius:8px; font-size:13px; font-weight:600; text-decoration:none; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:6px; }
+  .btn-primary { background:var(--teal); color:white; }
+  .btn-outline { background:white; color:var(--teal); border:2px solid var(--teal); }
+
+  .empty-state { text-align:center; padding:80px 40px; }
+  .empty-icon { font-size:64px; margin-bottom:20px; }
+  .empty-title { font-family:'Playfair Display',serif; font-size:24px; color:var(--ink); margin-bottom:10px; }
+  .empty-sub { font-size:14px; color:var(--soft); margin-bottom:28px; }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a href="/dashboard" class="topbar-logo">FOCUS</a>
+  <div class="nav-links">
+    <a href="/dashboard" class="nav-link">Dashboard</a>
+    <a href="/modules" class="nav-link">Modules</a>
+    <a href="/certificates" class="nav-link active">Certificats</a>
+  </div>
+  <a href="/logout" class="btn-logout">Déconnexion</a>
+</div>
+
+<div class="main">
+  <div class="page-title">🏅 Mes Certificats</div>
+  <div class="page-sub">Chaque certificat est vérifiable en ligne grâce à son identifiant unique.</div>
+
+  {% if certs %}
+  <div class="cert-grid">
+    {% for cert in certs %}
+    <div class="cert-card">
+      <div class="cert-banner" style="background:linear-gradient(135deg,{{ cert['module_color'] }},{{ cert['module_color'] }}CC)">
+        <div class="cert-banner-icon">{{ cert['module_icon'] }}</div>
+        <div class="cert-ribbon">🏅 Certifié</div>
+      </div>
+      <div class="cert-body">
+        <div class="cert-module">{{ cert['module_title'] }}</div>
+        <div class="cert-name">{{ user['full_name'] }}</div>
+        <div class="cert-meta">
+          <span class="cert-score">Score : {{ cert['final_score'] }}%</span>
+          <span class="cert-date">📅 {{ cert['issued_at'][:10] }}</span>
+        </div>
+        <div class="cert-uid">🔑 {{ cert['certificate_uid'] }}</div>
+        <div class="cert-actions">
+          <a href="/certificates/{{ cert['certificate_uid'] }}/download" class="btn btn-primary">📄 Télécharger PDF</a>
+          <a href="/verify/{{ cert['certificate_uid'] }}" class="btn btn-outline" target="_blank">🔍 Vérifier</a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-icon">📜</div>
+    <div class="empty-title">Aucun certificat pour l'instant</div>
+    <div class="empty-sub">Termine un module avec un score suffisant pour obtenir ton premier certificat FOCUS.</div>
+    <a href="/modules" class="btn btn-primary" style="display:inline-flex">→ Commencer ma formation</a>
+  </div>
+  {% endif %}
+</div>
+</body>
+</html>
