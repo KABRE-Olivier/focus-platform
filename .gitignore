@@ -1,0 +1,12 @@
+﻿*.db
+*.pyc
+__pycache__/
+certificates/
+*.env
+init_pg.py
+run_pg.py
+fix_*.py
+inject*.py
+test_*.py
+load_*.py
+apply_fix.py
