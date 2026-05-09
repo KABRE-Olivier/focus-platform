@@ -527,8 +527,8 @@ def get_inactive_members(days=14):
         SELECT id, full_name, email, last_login, establishment
         FROM users
         WHERE role='member' AND status='active'
-          AND (last_login IS NULL OR last_login < datetime('now', ?))
+          AND (last_login IS NULL OR last_login < NOW() - INTERVAL '14 days')
         ORDER BY last_login ASC
-    """, (f"-{days} days",)).fetchall()
+    """).fetchall()
     conn.close()
     return rows
